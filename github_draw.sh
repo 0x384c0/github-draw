@@ -1,6 +1,8 @@
 #!/bin/bash
 # Usage: git checkout master && git reset --hard only_script && sh github_draw.sh
 
+# TODO: generate from png - ffmpeg -i picture.png -f rawvideo -hide_banner -loglevel error - >> test.txt
+
 Username="0x384c0"
 Email="0x384c0@gmail.com"
 
