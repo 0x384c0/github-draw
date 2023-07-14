@@ -49,11 +49,13 @@ for col in {0..51}; do
 			COMMITS=1
 		fi
 		
-		for it in $(seq 1 $COMMITS); do
-			echo "${StartDate} ${line:col:1} ${it}" > $FILE_NAME
-			GIT_AUTHOR_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') GIT_COMMITTER_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') git commit ./$FILE_NAME -m "${line:col:1} ${it}"
-		done
-		StartDate=$(gdate --date=${StartDate}' + 1 day' '+%Y-%m-%d')		
+		if [$COMMITS != 0]; then
+			for it in $(seq 1 $COMMITS); do
+				echo "${StartDate} ${line:col:1} ${it}" > $FILE_NAME
+				GIT_AUTHOR_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') GIT_COMMITTER_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') git commit ./$FILE_NAME -m "${line:col:1} ${it}"
+			done
+		fi
+		StartDate=$(gdate --date=${StartDate}' + 1 day' '+%Y-%m-%d')
 	done
 done
 
