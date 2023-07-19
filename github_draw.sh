@@ -98,14 +98,14 @@ generate_commits(){
 	local columns=$((IMAGE_WIDTH - 1))
 
 	local png_max=255
-	local commits_canvas_max=10
+	local commits_canvas_max=15
 
 	info "Starting at ${StartDate}"
 
 	for col in $(seq 0 $columns); do
 		for row in $(seq 0 $rows); do
 		
-			index=$(($col + $row * $columns))
+			index=$(($col + $row * $IMAGE_WIDTH))
 			value=${raw_image_r_values[index]}
 			COMMITS=$((commits_canvas_max * value / png_max ))
 			COMMITS=$(printf '%.*f\n' 0 $COMMITS)
@@ -113,7 +113,7 @@ generate_commits(){
 			if [ $COMMITS != 0 ]; then
 				for it in $(seq 1 $COMMITS); do
 					echo "${StartDate} $COMMITS ${it}" >> $FILE_NAME
-					GIT_AUTHOR_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') GIT_COMMITTER_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') git commit ./$FILE_NAME -m "$COMMITS ${it}"
+					GIT_AUTHOR_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') GIT_COMMITTER_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') git commit ./$FILE_NAME --quiet -m "$COMMITS ${it}"
 				done
 			fi
 			StartDate=$(gdate --date=${StartDate}' + 1 day' '+%Y-%m-%d')
