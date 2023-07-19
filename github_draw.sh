@@ -102,8 +102,8 @@ generate_commits(){
 
 	info "Starting at ${StartDate}"
 
-	for row in $(seq 0 $rows); do
-		for col in $(seq 0 $columns); do
+	for col in $(seq 0 $columns); do
+		for row in $(seq 0 $rows); do
 		
 			index=$(($col + $row * $columns))
 			value=${raw_image_r_values[index]}
