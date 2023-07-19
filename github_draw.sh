@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Usage: git checkout master && git reset --hard only_script && sh github_draw.sh
+# Usage:
+# git checkout master && git reset --hard only_script && sh github_draw.sh
+# git push --force origin/master
+# git checkout only_script
+# On github/Repo Settings/Default branch switch branches from master and back to update activity canvas
 
 #################### constants
 
