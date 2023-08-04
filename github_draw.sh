@@ -8,9 +8,9 @@
 
 #################### constants
 
-FILE_NAME="useless.txt"
-
-IMAGE_FILE=picture.png
+GENERATED_PATH="generated/"
+IMAGES_PATH="images/*.png"
+CURRENT_YEAR_IMAGE_FILE=current
 IMAGE_WIDTH=52
 IMAGE_HEIGHT=7
 
@@ -80,20 +80,22 @@ setup_git_user() {
 }
 
 generate_commits(){
-	# To multiple commit counts by
-	Multiplier=1
-
-	# Let's start 1 year ago
-	OneYearAgo=$(gdate --date='1 year ago' '+%Y-%m-%d')
+	
+	if [ $YEAR == 0 ]; then
+		start_date=$(gdate --date='1 year ago' '+%Y-%m-%d')
+	else
+		start_date=$(gdate --date=$YEAR'-01-01' '+%Y-%m-%d')
+	fi
 
 	# Get to the previous Sunday of that date a year ago
-	DaysToSubtract=$(gdate --date='1 year ago' '+%w')
-	PrevSunday=$(gdate --date=${OneYearAgo}' - '${DaysToSubtract}' days' '+%Y-%m-%d')
+	days_to_subtract=$(gdate --date='1 year ago' '+%w')
+	prev_sunday=$(gdate --date=${start_date}' - '${days_to_subtract}' days' '+%Y-%m-%d')
 
 	# Add 1 week to that date
-	StartDate=$(gdate --date=${PrevSunday}' + 1 weeks' '+%Y-%m-%d')
+	start_date=$(gdate --date=${prev_sunday}' + 1 weeks' '+%Y-%m-%d')
 
 	rm -rf $FILE_NAME
+	mkdir -p $GENERATED_PATH
 	touch $FILE_NAME
 	git add $FILE_NAME
 
@@ -104,7 +106,7 @@ generate_commits(){
 	local png_max=255
 	local commits_canvas_max=15
 
-	info "Starting at ${StartDate}"
+	info "Starting at ${start_date}"
 
 	for col in $(seq 0 $columns); do
 		for row in $(seq 0 $rows); do
@@ -116,11 +118,11 @@ generate_commits(){
 			
 			if [ $COMMITS != 0 ]; then
 				for it in $(seq 1 $COMMITS); do
-					echo "${StartDate} $COMMITS ${it}" >> $FILE_NAME
-					GIT_AUTHOR_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') GIT_COMMITTER_DATE=$(gdate --date=${StartDate}' 12:00:00' --iso-8601='seconds') git commit ./$FILE_NAME --quiet -m "$COMMITS ${it}"
+					echo "${start_date} $COMMITS ${it}" >> $FILE_NAME
+					GIT_AUTHOR_DATE=$(gdate --date=${start_date}' 12:00:00' --iso-8601='seconds') GIT_COMMITTER_DATE=$(gdate --date=${start_date}' 12:00:00' --iso-8601='seconds') git commit ./$FILE_NAME --quiet -m "$COMMITS ${it}"
 				done
 			fi
-			StartDate=$(gdate --date=${StartDate}' + 1 day' '+%Y-%m-%d')
+			start_date=$(gdate --date=${start_date}' + 1 day' '+%Y-%m-%d')
 		done
 	done
 }
@@ -138,8 +140,26 @@ print_image_data() {
 # main
 ####################
 
-image_resize
-image_to_list
-setup_git_user
-generate_commits
-# print_image_data
+# setup_git_user
+
+for file_path in $IMAGES_PATH; do
+	file_name=$(basename -s .png "$file_path")
+	REGEX='^[0-9]{4}$'
+	if [ "$file_name" == $CURRENT_YEAR_IMAGE_FILE ]; then
+		YEAR=0
+	elif [[ "$file_name" =~ $REGEX ]]; then
+		YEAR=$file_name
+	else
+		warning "illegal image name $file_name"
+		continue
+	fi
+	info "Generating commits for $file_name year"
+	IMAGE_FILE="$file_path"
+	FILE_NAME="$GENERATED_PATH$file_name"
+
+	image_resize
+	image_to_list
+	generate_commits
+
+	# print_image_data
+done
