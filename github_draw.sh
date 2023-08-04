@@ -64,6 +64,7 @@ image_to_list() {
 	fi
 
 	local pixel_size=3
+	unset raw_image_r_values
 
 	for i in "${!raw_image[@]}"; do
 		if (( $(($i % $pixel_size )) == 0 )); then
