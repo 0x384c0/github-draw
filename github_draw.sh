@@ -109,9 +109,17 @@ generate_commits(){
 
 	info "Starting at ${start_date}"
 
+	progress_total=$((($columns + 1) * $rows))
+
 	for col in $(seq 0 $columns); do
 		for row in $(seq 0 $rows); do
 		
+			# print progress
+			progress_current=$(($col * $rows + $row))
+			progress_current=$(echo "scale=2; 100 * $progress_current / $progress_total" | bc -l)
+			printf "\rProgress: "$progress_current
+
+			# create commits
 			index=$(($col + $row * $IMAGE_WIDTH))
 			value=${raw_image_r_values[index]}
 			COMMITS=$((commits_canvas_max * value / png_max ))
@@ -126,6 +134,7 @@ generate_commits(){
 			start_date=$(gdate --date=${start_date}' + 1 day' '+%Y-%m-%d')
 		done
 	done
+	echo ""
 }
 
 #################### debug
