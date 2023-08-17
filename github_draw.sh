@@ -84,16 +84,22 @@ generate_commits(){
 	
 	if [ $YEAR == 0 ]; then
 		start_date=$(gdate --date='1 year ago' '+%Y-%m-%d')
+
+		# Get to the previous Sunday of that date a year ago
+		days_to_subtract=$(gdate --date='1 year ago' '+%w')
+		prev_sunday=$(gdate --date=${start_date}' - '${days_to_subtract}' days' '+%Y-%m-%d')
+
+		# Add 1 week to that date
+		start_date=$(gdate --date=${prev_sunday}' + 1 weeks' '+%Y-%m-%d')
 	else
-		start_date=$(gdate --date=$YEAR'-01-01' '+%Y-%m-%d')
+		first_sunday=$(gdate -d "$YEAR-01-01 +0 days +1 day" '+%Y-%m-%d')
+
+		while [ "$(gdate -d "$first_sunday" '+%A')" != "Sunday" ]; do
+			first_sunday=$(gdate -d "$first_sunday +1 day" '+%Y-%m-%d')
+		done
+
+		start_date=$first_sunday
 	fi
-
-	# Get to the previous Sunday of that date a year ago
-	days_to_subtract=$(gdate --date='1 year ago' '+%w')
-	prev_sunday=$(gdate --date=${start_date}' - '${days_to_subtract}' days' '+%Y-%m-%d')
-
-	# Add 1 week to that date
-	start_date=$(gdate --date=${prev_sunday}' + 1 weeks' '+%Y-%m-%d')
 
 	rm -rf $FILE_NAME
 	mkdir -p $GENERATED_PATH
