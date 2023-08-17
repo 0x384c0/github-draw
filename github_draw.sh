@@ -141,7 +141,7 @@ print_image_data() {
 # main
 ####################
 
-# setup_git_user
+setup_git_user
 
 for file_path in $IMAGES_PATH; do
 	file_name=$(basename -s .png "$file_path")
